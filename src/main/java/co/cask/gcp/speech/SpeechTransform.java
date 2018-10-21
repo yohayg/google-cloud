@@ -50,7 +50,8 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 /**
- * Class description here.
+ * This class <code>SpeechTransform</code> uses the Google Cloud API to translate audio recordinigs
+ * into text.
  */
 @Plugin(type = Transform.PLUGIN_TYPE)
 @Name(SpeechTransform.NAME)
