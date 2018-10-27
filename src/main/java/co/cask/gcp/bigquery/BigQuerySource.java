@@ -69,8 +69,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.ws.rs.Path;
 
-import static co.cask.gcp.common.GCPUtils.loadServiceAccountCredentials;
-
 /**
  * Class description here.
  */
@@ -249,18 +247,9 @@ public final class BigQuerySource extends BatchSource<LongWritable, GenericData.
   @Path("getSchema")
   public Schema getSchema(Request request) throws Exception {
     try {
-      BigQuery bigquery;
-      BigQueryOptions.Builder bigqueryBuilder = BigQueryOptions.newBuilder();
-      if (request.serviceFilePath != null) {
-        bigqueryBuilder.setCredentials(loadServiceAccountCredentials(request.serviceFilePath));
-      }
+      BigQueryOptions.Builder bigqueryBuilder = GCPUtils.getBigQuery(request.project, request.serviceFilePath);
+      BigQuery bigquery = bigqueryBuilder.build().getService();
       String project = request.project == null ? ServiceOptions.getDefaultProjectId() : request.project;
-      if (project == null) {
-        throw new Exception("Could not detect Google Cloud project id from the environment. " +
-                              "Please specify a project id.");
-      }
-      bigqueryBuilder.setProjectId(project);
-      bigquery = bigqueryBuilder.build().getService();
 
       TableId id = TableId.of(project, request.dataset, request.table);
       Table table = bigquery.getTable(id);

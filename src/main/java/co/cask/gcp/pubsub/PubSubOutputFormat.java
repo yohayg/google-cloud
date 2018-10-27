@@ -85,7 +85,7 @@ public class PubSubOutputFormat extends OutputFormat<NullWritable, Text> {
     long errorThreshold = Long.parseLong(config.get(ERROR_THRESHOLD));
     int retryTimeout = Integer.parseInt(config.get(RETRY_TIMEOUT_SECONDS));
     Publisher publisher = Publisher.newBuilder(ProjectTopicName.of(projectId, topic))
-      .setCredentialsProvider(() -> GCPUtils.loadServiceAccountCredentials(serviceAccountFilePath))
+      .setCredentialsProvider(() -> GCPUtils.loadCredentials(serviceAccountFilePath))
       .setBatchingSettings(getBatchingSettings(countSize, bytesThreshold, delayThreshold))
       .setRetrySettings(getRetrySettings(retryTimeout))
       .build();

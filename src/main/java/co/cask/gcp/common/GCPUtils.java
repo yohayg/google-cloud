@@ -18,6 +18,7 @@ package co.cask.gcp.common;
 
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.ServiceOptions;
+import com.google.cloud.bigquery.BigQueryOptions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +30,7 @@ import javax.annotation.Nullable;
  */
 public class GCPUtils {
 
-  public static ServiceAccountCredentials loadServiceAccountCredentials(String path) throws IOException {
+  public static ServiceAccountCredentials loadCredentials(String path) throws IOException {
     File credentialsPath = new File(path);
     try (FileInputStream serviceAccountStream = new FileInputStream(credentialsPath)) {
       return ServiceAccountCredentials.fromStream(serviceAccountStream);
@@ -47,5 +48,26 @@ public class GCPUtils {
         "Could not detect Google Cloud project id from the environment. Please specify a project id.");
     }
     return projectId;
+  }
+
+  /**
+   *
+   * @param projectId
+   * @param serviceFilePath
+   * @return
+   * @throws Exception
+   */
+  public static BigQueryOptions.Builder getBigQuery(String projectId, String serviceFilePath) throws Exception {
+    BigQueryOptions.Builder builder = BigQueryOptions.newBuilder();
+    if (serviceFilePath != null) {
+      builder.setCredentials(loadCredentials(serviceFilePath));
+    }
+    String project = projectId == null ? ServiceOptions.getDefaultProjectId() : projectId;
+    if (project == null) {
+      throw new Exception("Could not detect Google Cloud project id from the environment. " +
+                            "Please specify a project id.");
+    }
+    builder.setProjectId(project);
+    return builder;
   }
 }
